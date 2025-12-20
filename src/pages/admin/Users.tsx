@@ -71,7 +71,7 @@ export default function AdminUsers() {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
+    mutationFn: async ({ userId, newRole }: { userId: string; newRole: 'admin' | 'student' | 'teacher' }) => {
       const { error } = await supabase
         .from('user_roles')
         .update({ role: newRole })
@@ -216,7 +216,7 @@ export default function AdminUsers() {
                   <TableCell className="text-right">
                     <Select
                       value={user.role}
-                      onValueChange={(newRole) => updateRoleMutation.mutate({ userId: user.id, newRole })}
+                      onValueChange={(newRole) => updateRoleMutation.mutate({ userId: user.id, newRole: newRole as 'admin' | 'student' | 'teacher' })}
                     >
                       <SelectTrigger className="w-[120px]">
                         <SelectValue />
