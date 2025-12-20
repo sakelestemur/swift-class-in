@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Navigate } from 'react-router-dom';
 import { useCourses } from '@/hooks/useCourses';
 import { useActiveSession, useStartSession } from '@/hooks/useAttendance';
 import { QRCodeDisplay } from '@/components/qr/QRCodeDisplay';
@@ -16,8 +16,28 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { QrCode, Play, Loader2 } from 'lucide-react';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
 
 export default function TeacherSession() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['teacher', 'admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-96" />
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <TeacherSessionContent />;
+}
+
+function TeacherSessionContent() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const preselectedCourse = searchParams.get('course');

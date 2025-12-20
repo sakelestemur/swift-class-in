@@ -16,8 +16,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatCard } from '@/components/ui/stat-card';
 import { BarChart3, Users, CheckCircle, Clock, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
+import { Navigate } from 'react-router-dom';
 
 export default function TeacherReports() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['teacher', 'admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <TeacherReportsContent />;
+}
+
+function TeacherReportsContent() {
   const [selectedCourse, setSelectedCourse] = useState<string>('');
   const { data: courses, isLoading: loadingCourses } = useCourses();
   const { data: stats, isLoading: loadingStats } = useCourseAttendanceStats(selectedCourse || '');
