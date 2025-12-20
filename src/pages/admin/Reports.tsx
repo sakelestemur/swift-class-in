@@ -5,8 +5,32 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
 import { BarChart3, Users, BookOpen, Calendar, GraduationCap, UserCog, CheckCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
+import { Navigate } from 'react-router-dom';
 
 export default function AdminReports() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid gap-4 md:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <AdminReportsContent />;
+}
+
+function AdminReportsContent() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {

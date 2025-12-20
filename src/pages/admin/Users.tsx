@@ -28,6 +28,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Users, Plus, Search, Loader2, Shield, GraduationCap, UserCog } from 'lucide-react';
 import { format } from 'date-fns';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
+import { Navigate } from 'react-router-dom';
 
 interface UserWithRole {
   id: string;
@@ -40,6 +42,25 @@ interface UserWithRole {
 }
 
 export default function AdminUsers() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <AdminUsersContent />;
+}
+
+function AdminUsersContent() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const { toast } = useToast();

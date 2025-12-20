@@ -24,9 +24,34 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, BookOpen, Users, Copy, Check, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
 
 export default function TeacherCourses() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['teacher', 'admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map(i => <Skeleton key={i} className="h-48" />)}
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <TeacherCoursesContent />;
+}
+
+function TeacherCoursesContent() {
   const { data: courses, isLoading } = useCourses();
   const createMutation = useCreateCourse();
   const { toast } = useToast();

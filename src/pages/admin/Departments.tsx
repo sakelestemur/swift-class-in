@@ -26,8 +26,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Building2, Plus, Loader2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useRoleGuard } from '@/hooks/useRoleGuard';
+import { Navigate } from 'react-router-dom';
 
 export default function AdminDepartments() {
+  const { isAuthorized, loading: roleLoading } = useRoleGuard(['admin']);
+  
+  if (roleLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
+  
+  if (!isAuthorized) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <AdminDepartmentsContent />;
+}
+
+function AdminDepartmentsContent() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', code: '', institution_id: '' });
   const { toast } = useToast();

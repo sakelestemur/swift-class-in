@@ -254,17 +254,19 @@ export function useMarkAttendance() {
 
   return useMutation({
     mutationFn: async (qrData: string) => {
+      // Client-side basic validation first (fast fail for obviously invalid data)
       const verification = verifyQRCodeData(qrData);
       
       if (!verification.valid) {
         throw new Error(verification.error);
       }
 
-      // Get session info
-      const { data: sessionData } = JSON.parse(qrData);
       const sessionId = verification.sessionId;
+      if (!sessionId) {
+        throw new Error('Invalid QR code: no session found');
+      }
 
-      // Fetch session to check if it's active and get start time
+      // SERVER-SIDE VALIDATION: Fetch session and verify QR code matches stored data
       const { data: session, error: sessionError } = await supabase
         .from('attendance_sessions')
         .select('*')
@@ -274,6 +276,17 @@ export function useMarkAttendance() {
 
       if (sessionError) throw sessionError;
       if (!session) throw new Error('Session not found or has ended');
+
+      // Verify the scanned QR data matches the server-stored QR data
+      // This prevents replay attacks and ensures the QR code is currently valid
+      if (session.qr_code_data !== qrData) {
+        throw new Error('QR code has expired or is no longer valid');
+      }
+
+      // Verify server-side expiration
+      if (new Date(session.qr_expires_at) < new Date()) {
+        throw new Error('QR code has expired');
+      }
 
       // Check if student is enrolled
       const { data: enrollment, error: enrollError } = await supabase
