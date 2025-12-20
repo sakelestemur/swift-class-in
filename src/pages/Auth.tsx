@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDepartments } from '@/hooks/useDepartments';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { useToast } from '@/hooks/use-toast';
 import { QrCode, Loader2 } from 'lucide-react';
 import { z } from 'zod';
@@ -22,18 +22,16 @@ const signupSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   studentNumber: z.string().min(1, 'Student number is required'),
-  departmentId: z.string().min(1, 'Please select a department'),
 });
 
 export default function AuthPage() {
   const [tab, setTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '', password: '', fullName: '', studentNumber: '', departmentId: '',
+    email: '', password: '', fullName: '', studentNumber: '',
   });
   
   const { signIn, signUp } = useAuth();
-  const { data: departments } = useDepartments();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -62,7 +60,6 @@ export default function AuthPage() {
       const { error } = await signUp(formData.email, formData.password, {
         full_name: formData.fullName,
         student_number: formData.studentNumber,
-        department_id: formData.departmentId,
       });
       if (error) throw error;
       toast({ title: 'Account Created!', description: 'You can now log in.' });
@@ -123,15 +120,6 @@ export default function AuthPage() {
                 <div className="space-y-2">
                   <Label>Student Number</Label>
                   <Input value={formData.studentNumber} onChange={e => setFormData({...formData, studentNumber: e.target.value})} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Department</Label>
-                  <Select value={formData.departmentId} onValueChange={v => setFormData({...formData, departmentId: v})}>
-                    <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
-                    <SelectContent>
-                      {departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Password</Label>
