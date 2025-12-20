@@ -26,6 +26,9 @@ import AdminUsers from "@/pages/admin/Users";
 import AdminDepartments from "@/pages/admin/Departments";
 import AdminReports from "@/pages/admin/Reports";
 
+// Other pages
+import InstallPage from "@/pages/Install";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -38,6 +41,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/install" element={<InstallPage />} />
             
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
