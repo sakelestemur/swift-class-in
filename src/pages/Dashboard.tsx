@@ -44,10 +44,10 @@ export default function Dashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard title="Enrolled Courses" value={totalCourses} icon={BookOpen} variant="primary" />
-          <StatCard title="Total Attendance" value={totalAttendance} icon={CheckCircle2} variant="success" />
-          <StatCard title="Late Arrivals" value={lateCount} icon={Clock} variant="warning" />
-          <StatCard title="On-Time Rate" value={`${onTimeRate}%`} icon={TrendingUp} />
+          <StatCard title="Enrolled Courses" value={totalCourses} icon={<BookOpen className="h-5 w-5" />} variant="primary" />
+          <StatCard title="Total Attendance" value={totalAttendance} icon={<CheckCircle2 className="h-5 w-5" />} variant="success" />
+          <StatCard title="Late Arrivals" value={lateCount} icon={<Clock className="h-5 w-5" />} variant="warning" />
+          <StatCard title="On-Time Rate" value={`${onTimeRate}%`} icon={<TrendingUp className="h-5 w-5" />} />
         </div>
 
         {/* Recent Courses */}
